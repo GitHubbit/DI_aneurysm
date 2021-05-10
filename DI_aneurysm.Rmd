@@ -116,7 +116,6 @@ ridge.data <- gather(flow_experiments, gene, expression_level, ACVR1:VWF, factor
 # group and factorize
 ridge.data$Group <- as.factor(ridge.data$Group)
 
-
 # create separate data frames by each gene function
 
 # there's duplicate rows, remove one (HIF1A and H1F1A)
@@ -130,7 +129,6 @@ gene_types$gene <- toupper(gene_types$gene)
 # find genes present in gene_types but absent in flow_experiments
 # setdiff(gene_types$gene, ridge.data$gene) # these are the genes missing
 gene_types <- gene_types[gene_types$gene %in% ridge.data$gene, ]  # subset gene_types data frame
-
 
 # we need to plot each of these genes on ridge plot by their function
 # some of the genes have multiple functions, and we want to include the genes in multiple plots
@@ -156,22 +154,24 @@ ridge.by.path <- lapply(dfs, function(x) {
 
 ```
 
-**Plot changes in expression in inflammatory genes under different conditions. This can be repeated for any set of genes in a biological pathway of interest (TGF-beta, etc.)**
+**Plot changes in expression in just angiogenesis (development of new blood vessel) genes under different conditions. This can be repeated for any set of genes in a biological pathway of interest (TGF-beta, etc.)**
 
-```{r inflammation}
+```{r angiogensis}
 
-inflammation <- ggplot(ridge.by.path$inflammation,
-                       aes(x = ridge.by.path$inflammation$expression_level,
-                           y = ridge.by.path$inflammation$gene,
-                           fill = ridge.by.path$inflammation$Group,
-                           color = ridge.by.path$inflammation$Group)) + 
-  geom_density_ridges(scale = 0.8, size = 0.5, alpha = 0.2, rel_min_height = 0.01) + 
+angio <- ggplot(ridge.by.path$angiogenesis,
+                aes(x = ridge.by.path$angiogenesis$expression_level,
+                    y = ridge.by.path$angiogenesis$gene,
+                    fill = ridge.by.path$angiogenesis$Group,
+                    color = ridge.by.path$angiogenesis$Group)) + 
+  geom_density_ridges(scale = 0.95, size = 0.5, alpha = 0.2, rel_min_height = 0.01) + 
+  scale_y_discrete(expand = expand_scale(mult = c(0.1, 0))) +
   scale_fill_manual(
     name = "Conditions",
     values = c("#ffcc66", "#ccffcc", "#ff9999", "#99ccff"), guide = F) +
   scale_color_manual(
     name = NA,
-    values = c("#ffad66", "#91c491", "#e07070", "#3e7bb8"), guide = F) +
+    values = c("#ffad66", "#91c491", "#e07070", "#3e7bb8"), guide = F
+  ) +
   guides(fill = guide_legend(
     override.aes = list(
       fill = c("#ffcc66", "#ccffcc", "#ff9999", "#99ccff"),
@@ -184,13 +184,15 @@ inflammation <- ggplot(ridge.by.path$inflammation,
     x = "Expression Level",
     y = "Gene",
     title = "Expression Level in Response to Treatment Conditions",
-    subtitle = "Inflammation") +
+    subtitle = "Angiogenesis") +
   theme(axis.title = element_text(face="bold"),
         legend.title = element_text(face="bold")) 
 
-inflammation
+angio
+
 ```
-**Plots imply that there are both physiological and molecular responses to of aneurysms to treatment. The tSNE shows that cells Futher investigation on**
+
+**Plots imply that there are both physiological and molecular responses to of aneurysms to treatment. The tSNE shows that cells respond to aspirin treatment under aneurysm-like conditions. Of note is upregulation of EPHB4 in response to high pressure and aspirin, as well as aspirin mitigating the effect of over-expression of PCNA under high pressure.**
 
 
 
